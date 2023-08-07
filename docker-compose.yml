@@ -10,8 +10,6 @@ services:
       - 4000:4000
     environment:
       PORT: 4000
-      ALLOWED_SITES: "*"
-      CONFIG_SCHEMA: config.json
 
       # db config
       POSTGRES_USERNAME: postgres
