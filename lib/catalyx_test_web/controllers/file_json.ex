@@ -1,4 +1,4 @@
-defmodule CatalyxTestWeb.FileView do
+defmodule CatalyxTestWeb.FileJSON do
 
   def render("upload_url.json", %{url: url}) do
     %{

@@ -27,4 +27,14 @@ defmodule CatalyxTest.AWS.S3Client do
       opts
     )
   end
+
+  def does_object_exist(object_key) do
+    with {:ok, url} <- get_presigned_url(:head, object_key, virtual_host: is_prod()),
+         {:ok, %HTTPoison.Response{status_code: 200}} <- HTTPoison.head(url) do
+      :ok
+    else
+      _ ->
+        :not_found
+    end
+  end
 end

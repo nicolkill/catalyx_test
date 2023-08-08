@@ -45,7 +45,9 @@ defmodule CatalyxTest.MixProject do
       {:ex_aws_sqs, "~> 3.3"},
       {:broadway, "~> 1.0"},
       {:broadway_sqs, "~> 0.7.1"},
-      {:hackney, "~> 1.9"}
+      {:hackney, "~> 1.9"},
+      {:mock, "~> 0.3.0", only: :test},
+      {:httpoison, "~> 2.0"}
     ]
   end
 
