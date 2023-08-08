@@ -18,7 +18,7 @@ image:
 	docker tag ${IMAGE_TAG}:${REVISION} ${IMAGE_TAG}:latest
 
 testing:
-	docker compose exec app MIX_ENV=test mix test
+	docker compose exec app mix test
 
 iex:
 	docker compose exec app iex -S mix

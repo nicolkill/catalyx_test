@@ -15,9 +15,11 @@ defmodule CatalyxTest.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: CatalyxTest.PubSub},
       # Start the Endpoint (http/https)
-      CatalyxTestWeb.Endpoint
+      CatalyxTestWeb.Endpoint,
       # Start a worker by calling: CatalyxTest.Worker.start_link(arg)
       # {CatalyxTest.Worker, arg}
+      {CatalyxTest.Broadway.NewFileEventHandler, []},
+      CatalyxTest.CsvProcessor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

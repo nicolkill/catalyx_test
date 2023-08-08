@@ -1,5 +1,14 @@
 import Config
 
+defmodule RuntimeUtil do
+  def get_env_or_raise_error(var_name),
+      do:
+        System.get_env(var_name) ||
+          raise("""
+          environment variable #{var_name} is missing.
+          """)
+end
+
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
 # system starts, so it is typically used to load production configuration
@@ -57,6 +66,16 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  config :ex_aws, :s3,
+    region: RuntimeUtil.get_env_or_raise_error("AWS_REGION"),
+    bucket: RuntimeUtil.get_env_or_raise_error("AWS_S3_BUCKET")
+
+  config :ex_aws, :sqs,
+    region: RuntimeUtil.get_env_or_raise_error("AWS_REGION"),
+    base_queue_url: RuntimeUtil.get_env_or_raise_error("AWS_BASE_QUEUE_URL"),
+    new_files_queue: RuntimeUtil.get_env_or_raise_error("AWS_SQS_NEW_FILES_QUEUE"),
+    general_events_queue: RuntimeUtil.get_env_or_raise_error("AWS_SQS_GENERAL_EVENTS_QUEUE")
 
   # ## SSL Support
   #

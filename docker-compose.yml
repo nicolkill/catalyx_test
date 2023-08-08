@@ -16,6 +16,15 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DATABASE: postgres
       POSTGRES_HOSTNAME: postgres
+      # aws config
+      AWS_PORT: 4566
+      AWS_HOST: localstack
+      AWS_REGION: us-west-2
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_S3_BUCKET: files
+      AWS_SQS_NEW_FILES_QUEUE: new_files_queue
+      AWS_SQS_GENERAL_EVENTS_QUEUE: general_events_queue
 
   postgres:
     image: postgres:13.3-alpine
@@ -26,3 +35,24 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - 5432:5432
+
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - 4566:4566
+    environment:
+      # own env vars
+      BUCKET_NAME: files
+      BUCKET_QUEUE: new_files_queue
+      QUEUES: general_events_queue,example_queue
+      # service env vars
+      DEFAULT_REGION: us-west-2
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      SERVICES: s3,sqs
+      DISABLE_CORS_CHECKS: 1
+      PROVIDER_OVERRIDE_S3: asf
+      S3_SKIP_SIGNATURE_VALIDATION: 1
+    volumes:
+      - ./.localstack:/var/lib/localstack
+      - ./init_localstack.sh:/etc/localstack/init/ready.d/init_localstack.sh

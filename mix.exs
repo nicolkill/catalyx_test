@@ -39,7 +39,13 @@ defmodule CatalyxTest.MixProject do
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+      {:ex_aws, "~> 2.1"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:ex_aws_sqs, "~> 3.3"},
+      {:broadway, "~> 1.0"},
+      {:broadway_sqs, "~> 0.7.1"},
+      {:hackney, "~> 1.9"}
     ]
   end
 
