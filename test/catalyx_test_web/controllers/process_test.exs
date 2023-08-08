@@ -62,7 +62,21 @@ defmodule CatalyxTestWeb.ProcessTest do
         )
 
       assert_receive {:ack, ^ref, [%{data: ^message}], []}
-      assert {[{"files", "test_file.csv"}], false} == CsvProcessor.lookup()
+      assert {["test_file.csv"], false} == CsvProcessor.lookup()
+    end
+  end
+
+  test "process_file", %{conn: _conn}  do
+    with_mocks([
+      {CatalyxTest.AWS.S3Client,
+        [],
+        [does_object_exist: fn(_) -> :ok end]},
+      {CatalyxTest.AWS.S3Client,
+        [],
+        [download_object: fn(_, _) -> {:ok, :done} end]}
+    ]) do
+      assert :ok = CsvProcessor.process_file("example.csv")
+                   |> IO.inspect(label: "CsvProcessor.process_file")
     end
   end
 

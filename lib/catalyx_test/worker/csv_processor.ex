@@ -98,12 +98,30 @@ defmodule CatalyxTest.CsvProcessor do
   end
 
   defp process_chunk(chunk) do
-    Enum.map(chunk, fn part ->
-      part
-      |> String.trim()
-      |> String.split(",")
+    Enum.flat_map(chunk, fn
+      "id,market" <> _ ->
+        []
+      part ->
+        data =
+          part
+          |> String.trim()
+          |> String.split(",")
+        [data]
     end)
-    |> IO.inspect(label: "my chunk")
+    |> Enum.reduce(Ecto.Multi.new(), fn row, transaction ->
+      [external_id, market_symbol, size, price, taker_side, executed_at] = row
+      changeset = CatalyxTest.Finances.new_change_trade(%{
+        market_symbol: market_symbol,
+        amount: size,
+        price: price,
+        transaction_type: taker_side,
+        executed_at: executed_at,
+        external_id: external_id
+      })
+
+      Ecto.Multi.insert(transaction, "#{market_symbol}_#{external_id}", changeset)
+    end)
+    |> CatalyxTest.Repo.transaction
   end
   
 end

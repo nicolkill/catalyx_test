@@ -23,7 +23,7 @@ defmodule CatalyxTestWeb.FileController do
   This function generates a presigned url to push a file to s3 and then the bucket will do their work in the queues
   """
   def get_presigned_url(conn, _) do
-    file_name = "#{Generator.generate_unique_ref()}.csv"
+    file_name = "file_#{Generator.generate_unique_ref()}.csv"
 
     {:ok, url} =
       S3Client.presigned_url_upload(file_name, @presigned_url_opts)
