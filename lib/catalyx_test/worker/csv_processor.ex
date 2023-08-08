@@ -1,6 +1,10 @@
 defmodule CatalyxTest.CsvProcessor do
   use GenServer
 
+  alias CatalyxTest.AWS.S3Client
+
+  @downloads_folder "downloads"
+
   @doc """
   Simple list as state
   """
@@ -22,18 +26,18 @@ defmodule CatalyxTest.CsvProcessor do
   end
 
   @impl true
-  def handle_cast({:add, file}, {files, processing}) do
-    {:noreply, {[file | files], processing}}
+  def handle_cast({:add, file_path}, {files, processing}) do
+    {:noreply, {[file_path | files], processing}}
   end
-  def handle_cast(:continue, {files, processing}) do
-    {:noreply, {files, processing}}
-  end
-
-  def schedule_file(file) do
-    GenServer.cast(CsvProcessor, {:add, file})
+  def handle_cast(:continue, {files, _}) do
+    {:noreply, {files, false}}
   end
 
-  defp continue_process() do
+  def schedule_file(file_path) do
+    GenServer.cast(CsvProcessor, {:add, file_path})
+  end
+
+  defp continue_checking() do
     GenServer.cast(CsvProcessor, :continue)
   end
 
@@ -45,26 +49,61 @@ defmodule CatalyxTest.CsvProcessor do
   def handle_info(:file_process, {files, false}) do
     {files, processing} =
       case files do
-        [file | rest] ->
-          Task.Supervisor.async_nolink(CatalyxTest.Supervisor, CatalyxTest.CsvProcessor, :process_file, [file])
+        [file_path | rest] ->
+          Task.async(CatalyxTest.CsvProcessor, :process_file, [file_path])
           {rest, true}
         [] ->
           {files, false}
       end
 
+    schedule_file_check()
+
     {:noreply, {files, processing}}
   end
+  def handle_info(_, {files, processing}), do: {:noreply, {files, processing}}
 
   defp schedule_file_check() do
     # check again in 2 seconds
     Process.send_after(self(), :file_process, 5  * 1000)
   end
 
-  @spec process_file({String.t(), String.t()}) :: any()
-  def process_file({bucket, object_key}) do
-    IO.inspect("processing file")
+  @spec process_file(String.t()) :: any()
+  def process_file(s3_path) do
+    try do
+      :ok = S3Client.does_object_exist(s3_path)
 
-#    continue_process()
+      file_path =
+        :catalyx_test
+        |> :code.priv_dir()
+        |> (&"#{&1}/#{@downloads_folder}/#{s3_path}").()
+
+      :ok =
+        case S3Client.download_object(s3_path, file_path) do
+          {:ok, :done} -> :ok
+          _ -> :error
+        end
+
+      File.stream!(file_path)
+      |> Stream.chunk_every(30)
+      |> Stream.map(&process_chunk/1)
+      |> Stream.run()
+    rescue
+      e ->
+        IO.inspect(e, label: "file error")
+        IO.inspect(Exception.format(:error, e, __STACKTRACE__), label: "stacktrace")
+        :ok
+    end
+
+    continue_checking()
+  end
+
+  defp process_chunk(chunk) do
+    Enum.map(chunk, fn part ->
+      part
+      |> String.trim()
+      |> String.split(",")
+    end)
+    |> IO.inspect(label: "my chunk")
   end
   
 end

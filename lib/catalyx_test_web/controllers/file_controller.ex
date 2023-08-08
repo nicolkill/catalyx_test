@@ -9,12 +9,10 @@ defmodule CatalyxTestWeb.FileController do
   # 100 MB
   @presigned_upload_url_max_file_size 100 * 1_000_000
 
-  """
-  specs for the presigned urls:
-    - must starts with `Content-Type` header
-    - the link expires in 30 minutes
-    - the max file size its 100mb
-  """
+  # specs for the presigned urls:
+  #   - must starts with `Content-Type` header
+  #   - the link expires in 30 minutes
+  #   - the max file size its 100mb
   @presigned_url_opts [
     ["starts-with", "$Content-Type", ""],
     {:expires_in, @presigned_upload_url_max_age},
@@ -25,9 +23,10 @@ defmodule CatalyxTestWeb.FileController do
   This function generates a presigned url to push a file to s3 and then the bucket will do their work in the queues
   """
   def get_presigned_url(conn, _) do
+    file_name = "#{Generator.generate_unique_ref()}.csv"
+
     {:ok, url} =
-      Generator.generate_unique_ref()
-      |> S3Client.presigned_url_upload(@presigned_url_opts)
+      S3Client.presigned_url_upload(file_name, @presigned_url_opts)
 
     conn
     |> put_status(200)

@@ -35,11 +35,11 @@ defmodule CatalyxTestWeb.ProcessTest do
               "s3SchemaVersion" => "1.0",
               "configurationId" => "testConfigRule",
               "bucket" => %{
-                "name" => "new_files_queue",
+                "name" => "files",
                 "ownerIdentity" => %{
                   "principalId" => "A3NL1KOZZKExample"
                 },
-                "arn" => "arn:aws:s3:::new_files_queue"
+                "arn" => "arn:aws:s3:::files"
               },
               "object" => %{
                 "key" => "test_file.csv",
@@ -62,7 +62,7 @@ defmodule CatalyxTestWeb.ProcessTest do
         )
 
       assert_receive {:ack, ^ref, [%{data: ^message}], []}
-      assert {[{"new_files_queue", "test_file.csv"}], false} == CsvProcessor.lookup()
+      assert {[{"files", "test_file.csv"}], false} == CsvProcessor.lookup()
     end
   end
 

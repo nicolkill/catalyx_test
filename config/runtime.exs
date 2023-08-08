@@ -74,8 +74,7 @@ if config_env() == :prod do
   config :ex_aws, :sqs,
     region: RuntimeUtil.get_env_or_raise_error("AWS_REGION"),
     base_queue_url: RuntimeUtil.get_env_or_raise_error("AWS_BASE_QUEUE_URL"),
-    new_files_queue: RuntimeUtil.get_env_or_raise_error("AWS_SQS_NEW_FILES_QUEUE"),
-    general_events_queue: RuntimeUtil.get_env_or_raise_error("AWS_SQS_GENERAL_EVENTS_QUEUE")
+    new_files_queue: RuntimeUtil.get_env_or_raise_error("AWS_SQS_NEW_FILES_QUEUE")
 
   # ## SSL Support
   #

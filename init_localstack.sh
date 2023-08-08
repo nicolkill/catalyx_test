@@ -19,14 +19,6 @@ echo "########### Creating upload file event SQS ###########"
 create_queue $BUCKET_QUEUE
 BUCKET_QUEUE_ARN=$(guess_arn_for_sqs $BUCKET_QUEUE)
 
-echo "########### Creating queues in SQS ###########"
-IFS=','
-read -ra Queues <<< "$QUEUES"
-for q in "${Queues[@]}";
-do
-  create_queue $q
-done
-
 echo "########### Create S3 bucket ###########"
 awslocal s3api create-bucket\
     --region $DEFAULT_REGION\

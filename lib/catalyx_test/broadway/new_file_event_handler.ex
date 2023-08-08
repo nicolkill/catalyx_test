@@ -40,16 +40,13 @@ defmodule CatalyxTest.Broadway.NewFileEventHandler do
             "eventName" => event_name,
             "eventSource" => "aws:s3",
             "s3" => %{
-              "bucket" => %{
-                "name" => bucket
-              },
               "object" => %{
                 "key" => object_key
               }
             }
           }
           when event_name in ["ObjectCreated:Put", "ObjectCreated:Post"] ->
-            CsvProcessor.schedule_file({bucket, object_key})
+            CsvProcessor.schedule_file(object_key)
           _ ->
             :ok
         end)

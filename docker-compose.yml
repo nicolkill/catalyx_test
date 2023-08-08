@@ -24,7 +24,6 @@ services:
       AWS_SECRET_ACCESS_KEY: test
       AWS_S3_BUCKET: files
       AWS_SQS_NEW_FILES_QUEUE: new_files_queue
-      AWS_SQS_GENERAL_EVENTS_QUEUE: general_events_queue
 
   postgres:
     image: postgres:13.3-alpine
@@ -44,7 +43,6 @@ services:
       # own env vars
       BUCKET_NAME: files
       BUCKET_QUEUE: new_files_queue
-      QUEUES: general_events_queue,example_queue
       # service env vars
       DEFAULT_REGION: us-west-2
       AWS_ACCESS_KEY_ID: test

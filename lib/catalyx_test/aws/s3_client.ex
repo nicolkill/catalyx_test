@@ -37,4 +37,10 @@ defmodule CatalyxTest.AWS.S3Client do
         :not_found
     end
   end
+
+  def download_object(object_key, file_path),
+      do:
+        s3_bucket()
+        |> ExAws.S3.download_file(object_key, file_path)
+        |> ExAws.request()
 end

@@ -1,4 +1,6 @@
-# CatalyxTest
+## CatalyxTest
+
+
 
 To start your Phoenix server:
 
@@ -7,12 +9,15 @@ To start your Phoenix server:
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+## How to push file
 
-## Learn more
+First call to the endpoint `POST "/api/v1/get_presigned_url"` and get the presigned url
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+This new url must be called using PUT using the entire file as body
+
+#### Examples
+
+```elixir
+url = "https://localstack:4566"
+%{status_code: code} = HTTPoison.put!(url, {:file, "/example/path"})
+```
