@@ -24,21 +24,25 @@ defmodule CatalyxTest.Finances do
       [%Trade{}, ...]
 
   """
-  @spec list_trades(integer()) :: [%Trade{}]
-  def list_trades(size \\ 50) do
+  @spec list_trades(keyword(), integer()) :: [%Trade{}]
+  def list_trades(where \\ [], size \\ 50) do
     Trade
+    |> where(^where)
     |> last_trades_query(size)
     |> Repo.all()
   end
 
-  @spec list_trades_by_market_symbol(String.t(), integer()) :: [%Trade{}]
-  def list_trades_by_market_symbol(market_symbol, size \\ 50) do
+  @spec list_trades_time_frame(Date.t(), Date.t(), keyword()) :: [%Trade{}]
+  def list_trades_time_frame(start_date, end_date, where \\ []) do
     Trade
-    |> where(market_symbol: ^market_symbol)
-    |> last_trades_query(size)
+    |> where(^where)
+    |> where([t], t.executed_at_date >= ^start_date)
+    |> where([t], t.executed_at_date <= ^end_date)
+    |> order_by([t], desc: t.executed_at_date, desc: t.executed_at_time)
     |> Repo.all()
   end
 
+  @spec trades_count_with_period() :: [%Trade{}]
   def trades_count_with_period() do
     Trade
     |> select([t], {t.executed_at_date, count(t.id)})
@@ -46,8 +50,10 @@ defmodule CatalyxTest.Finances do
     |> Repo.all()
   end
 
+  @spec get_trades_by_period_stream(Date.t()) :: Enum.t()
   def get_trades_by_period_stream(period) do
     Trade
+    |> where(processed: false)
     |> where(executed_at_date: ^period)
     |> Repo.stream()
   end
@@ -66,6 +72,7 @@ defmodule CatalyxTest.Finances do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_trade!(String.t()) :: %Trade{}
   def get_trade!(id), do: Repo.get!(Trade, id)
 
   @doc """
@@ -80,6 +87,7 @@ defmodule CatalyxTest.Finances do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec create_trade(map()) :: {:ok | :error, %Trade{}}
   def create_trade(attrs \\ %{}) do
     %Trade{}
     |> Trade.changeset(attrs)
@@ -98,6 +106,7 @@ defmodule CatalyxTest.Finances do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_trade(Trade.t(), map()) :: {:ok | :error, %Trade{}}
   def update_trade(%Trade{} = trade, attrs) do
     trade
     |> Trade.changeset(attrs)
@@ -116,6 +125,7 @@ defmodule CatalyxTest.Finances do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec delete_trade(Trade.t()) :: {:ok | :error, %Trade{}}
   def delete_trade(%Trade{} = trade) do
     Repo.delete(trade)
   end
@@ -129,10 +139,12 @@ defmodule CatalyxTest.Finances do
       %Ecto.Changeset{data: %Trade{}}
 
   """
+  @spec change_trade(Trade.t(), map()) :: %Ecto.Changeset{}
   def change_trade(%Trade{} = trade, attrs \\ %{}) do
     Trade.changeset(trade, attrs)
   end
 
+  @spec new_change_trade(map()) :: %Trade{}
   def new_change_trade(attrs \\ %{}) do
     Trade.changeset(%Trade{}, attrs)
   end
@@ -146,8 +158,35 @@ defmodule CatalyxTest.Finances do
       [%CandleIndicator{}, ...]
 
   """
-  def list_candle_indicators(count \\ 20) do
-    Repo.all(CandleIndicator)
+  @spec list_candle_indicators(keyword(), integer()) :: [%CandleIndicator{}]
+  def list_candle_indicators(where \\ [], size \\ 50) do
+    CandleIndicator
+    |> where(^where)
+    |> Repo.all()
+  end
+
+  defp list_default_queries(query, start_date, end_date, where) do
+    query
+    |> where(^where)
+    |> where([t], t.period >= ^start_date)
+    |> where([t], t.period <= ^end_date)
+  end
+
+  @spec list_candle_indicators_time_frame(Date.t(), Date.t()) :: [%Trade{}]
+  def list_candle_indicators_time_frame(start_date, end_date, where \\ []) do
+    CandleIndicator
+    |> list_default_queries(start_date, end_date, where)
+    |> order_by([t], asc: t.period)
+    |> Repo.all()
+  end
+
+  @spec last_candle_indicators_time_frame(Date.t(), Date.t()) :: [%Trade{}]
+  def last_candle_indicators_time_frame(start_date, end_date, where \\ [], size \\ 50) do
+    CandleIndicator
+    |> list_default_queries(start_date, end_date, where)
+    |> limit(^size)
+    |> order_by([t], desc: t.period)
+    |> Repo.all()
   end
 
   def get_candle_indicator_by_period!(period, symbol) do

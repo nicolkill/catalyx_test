@@ -6,6 +6,12 @@ defmodule CatalyxTestWeb.FallbackController do
   """
   use CatalyxTestWeb, :controller
 
+  def call(conn, {field, {:error, :invalid_format}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{errors: ["#{field} has invalid format"]})
+  end
+
   def call(conn, {:error, %MapSchemaValidator.InvalidMapError{message: message}}) do
     conn
     |> put_status(:unprocessable_entity)

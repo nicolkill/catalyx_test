@@ -18,8 +18,8 @@ defmodule CatalyxTest.Finances.CandleIndicator do
     timestamps()
   end
 
-  @fields [:opening_at, :opening_price, :closing_at, :closing_price, :highest_price, :lowest_price, :trend, :period, :market_symbol]
-  @required_fields @fields
+  @required_fields [:opening_at, :opening_price, :closing_at, :closing_price, :highest_price, :lowest_price, :trend, :period, :market_symbol]
+  @fields @required_fields
 
   @doc false
   def changeset(candle_indicator, attrs) do

@@ -6,6 +6,39 @@ defmodule CatalyxTestWeb.CandleIndicatorController do
 
   action_fallback CatalyxTestWeb.FallbackController
 
+  def index(conn, %{"size" => size, "start" => start_date, "end" => end_date} = params) do
+    with {_, {:ok, start_date}} <- {"start_date", Date.from_iso8601(start_date)},
+         {_, {:ok, end_date}} <- {"end_date", Date.from_iso8601(end_date)} do
+      market = Map.get(params, "market")
+      query = if is_nil(market), do: [], else: [market_symbol: market]
+
+      candle_indicators = Finances.last_candle_indicators_time_frame(start_date, end_date, query, size)
+      render(conn, :index, candle_indicators: candle_indicators)
+    end
+  end
+
+  def index(conn, %{"start" => start_date, "end" => end_date} = params) do
+    with {_, {:ok, start_date}} <- {"start_date", Date.from_iso8601(start_date)},
+         {_, {:ok, end_date}} <- {"end_date", Date.from_iso8601(end_date)} do
+      market = Map.get(params, "market")
+      query = if is_nil(market), do: [], else: [market_symbol: market]
+
+      candle_indicators = Finances.list_candle_indicators_time_frame(start_date, end_date, query)
+      render(conn, :index, candle_indicators: candle_indicators)
+    end
+  end
+
+
+
+
+
+
+
+
+
+
+
+
   def index(conn, _params) do
     candle_indicators = Finances.list_candle_indicators()
     render(conn, :index, candle_indicators: candle_indicators)

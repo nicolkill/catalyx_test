@@ -12,12 +12,13 @@ defmodule CatalyxTest.Finances.Trade do
     field :executed_at_date, :date
     field :executed_at_time, :time
     field :external_id, :string
+    field :processed, :boolean, default: false
 
     timestamps()
   end
 
-  @fields [:market_symbol, :amount, :price, :transaction_type, :executed_at_date, :executed_at_time, :external_id]
-  @required_fields @fields
+  @required_fields [:market_symbol, :amount, :price, :transaction_type, :executed_at_date, :executed_at_time, :external_id]
+  @fields @required_fields ++ [:processed]
 
   @doc false
   def changeset(trade, attrs) do

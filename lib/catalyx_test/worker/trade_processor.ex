@@ -99,6 +99,8 @@ defmodule CatalyxTest.TradeProcessor do
             executed_at_time: executed_at_time
           } = trade
 
+          trade = Finances.change_trade(trade, %{processed: true})
+
           int_amount = ceil(amount)
           unit_price = ((int_amount * price) / amount) / int_amount
 
@@ -120,7 +122,7 @@ defmodule CatalyxTest.TradeProcessor do
           lowest = if unit_price < lowest, do: unit_price, else: lowest
 
           {
-            Ecto.Multi.delete(transaction, "#{market_symbol}_#{external_id}", trade),
+            Ecto.Multi.update(transaction, "#{market_symbol}_#{external_id}", trade),
             trend,
             opening_at,
             opening,

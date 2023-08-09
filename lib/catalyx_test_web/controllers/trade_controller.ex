@@ -11,20 +11,22 @@ defmodule CatalyxTestWeb.TradeController do
 
     trades =
       if is_nil(symbol) do
-        Finances.list_trades(size)
+        Finances.list_trades([], size)
       else
         symbol = Map.get(params, "symbol")
-        Finances.list_trades_by_market_symbol(symbol, size)
+        Finances.list_trades([market_symbol: symbol], size)
       end
 
     render(conn, :index, trades: trades)
   end
-  def index(conn, _params), do: index(conn, %{"size" => 50})
-
-  def index_time_window(conn, %{"start" => start_date, "end" => end_date}) do
-
-    render(conn, :index, trades: trades)
+  def index(conn, %{"start" => start_date, "end" => end_date}) do
+    with {_, {:ok, start_date}} <- {"start_date", Date.from_iso8601(start_date)},
+         {_, {:ok, end_date}} <- {"end_date", Date.from_iso8601(end_date)} do
+      trades = Finances.list_trades_time_frame(start_date, end_date)
+      render(conn, :index, trades: trades)
+    end
   end
+  def index(conn, _params), do: index(conn, %{"size" => 50})
 
   def insert_multi(conn, params) do
     schema = %{
