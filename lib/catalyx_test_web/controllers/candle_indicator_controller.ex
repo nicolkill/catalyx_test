@@ -13,7 +13,9 @@ defmodule CatalyxTestWeb.CandleIndicatorController do
       market = Map.get(params, "market")
       query = if is_nil(market), do: [], else: [market_symbol: market]
 
-      candle_indicators = Finances.last_candle_indicators_time_frame(start_date, end_date, query, size)
+      candle_indicators =
+        Finances.last_candle_indicators_time_frame(start_date, end_date, query, size)
+
       render(conn, :index, candle_indicators: candle_indicators)
     end
   end
@@ -43,15 +45,16 @@ defmodule CatalyxTestWeb.CandleIndicatorController do
           {Date.add(today, -@six_months), today}
       end
 
-    candle_indicators = Finances.list_candle_indicators_time_frame(start_date, end_date, [market_symbol: market])
+    candle_indicators =
+      Finances.list_candle_indicators_time_frame(start_date, end_date, market_symbol: market)
+
     render(conn, :sma_index, candle_indicators: candle_indicators)
   end
 
   def sma_show(conn, %{"market" => market, "date" => date}) do
     with {_, {:ok, date}} <- {"date", Date.from_iso8601(date)} do
-      candle_indicator = Finances.get_candle_indicator_query([market_symbol: market, period: date])
+      candle_indicator = Finances.get_candle_indicator_query(market_symbol: market, period: date)
       render(conn, :sma_show, candle_indicator: candle_indicator)
     end
   end
-
 end

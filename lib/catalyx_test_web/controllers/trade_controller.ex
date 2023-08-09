@@ -19,6 +19,7 @@ defmodule CatalyxTestWeb.TradeController do
 
     render(conn, :index, trades: trades)
   end
+
   def index(conn, %{"start" => start_date, "end" => end_date}) do
     with {_, {:ok, start_date}} <- {"start_date", Date.from_iso8601(start_date)},
          {_, {:ok, end_date}} <- {"end_date", Date.from_iso8601(end_date)} do
@@ -26,6 +27,7 @@ defmodule CatalyxTestWeb.TradeController do
       render(conn, :index, trades: trades)
     end
   end
+
   def index(conn, _params), do: index(conn, %{"size" => 50})
 
   def insert_multi(conn, params) do
@@ -44,6 +46,7 @@ defmodule CatalyxTestWeb.TradeController do
 
     with {:ok, _} <- MapSchemaValidator.validate(schema, params) do
       %{"data" => data} = params
+
       trades =
         Enum.map(data, fn trade_params ->
           date_time =

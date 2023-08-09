@@ -30,6 +30,7 @@ defmodule CatalyxTest.CsvProcessor do
   def handle_cast({:add, file_path}, {files, processing}) do
     {:noreply, {[file_path | files], processing}}
   end
+
   def handle_cast(:continue, {files, _}) do
     {:noreply, {files, false}}
   end
@@ -47,12 +48,14 @@ defmodule CatalyxTest.CsvProcessor do
   """
   @impl true
   def handle_info(:file_process, {files, true}), do: {:noreply, {files, true}}
+
   def handle_info(:file_process, {files, false}) do
     {files, processing} =
       case files do
         [file_path | rest] ->
           Task.async(__MODULE__, :process_file, [file_path])
           {rest, true}
+
         [] ->
           {files, false}
       end
@@ -61,11 +64,12 @@ defmodule CatalyxTest.CsvProcessor do
 
     {:noreply, {files, processing}}
   end
+
   def handle_info(_, {files, processing}), do: {:noreply, {files, processing}}
 
   defp schedule_file_check() do
     # check again in 5 seconds
-    Process.send_after(self(), :file_process, 5  * 1000)
+    Process.send_after(self(), :file_process, 5 * 1000)
   end
 
   @spec process_file(String.t()) :: any()
@@ -101,11 +105,13 @@ defmodule CatalyxTest.CsvProcessor do
     |> Enum.flat_map(fn
       "id,market" <> _ ->
         []
+
       part ->
         data =
           part
           |> String.trim()
           |> String.split(",")
+
         [data]
     end)
     |> Enum.reduce(Ecto.Multi.new(), fn row, transaction ->
@@ -113,19 +119,19 @@ defmodule CatalyxTest.CsvProcessor do
 
       date_time = NaiveDateTime.from_iso8601!(executed_at)
 
-      changeset = CatalyxTest.Finances.new_change_trade(%{
-        market_symbol: market_symbol,
-        amount: size,
-        price: price,
-        transaction_type: taker_side,
-        executed_at_date: NaiveDateTime.to_date(date_time),
-        executed_at_time: NaiveDateTime.to_time(date_time),
-        external_id: external_id
-      })
+      changeset =
+        CatalyxTest.Finances.new_change_trade(%{
+          market_symbol: market_symbol,
+          amount: size,
+          price: price,
+          transaction_type: taker_side,
+          executed_at_date: NaiveDateTime.to_date(date_time),
+          executed_at_time: NaiveDateTime.to_time(date_time),
+          external_id: external_id
+        })
 
       Ecto.Multi.insert(transaction, "#{market_symbol}_#{external_id}", changeset)
     end)
     |> CatalyxTest.Repo.transaction()
   end
-  
 end

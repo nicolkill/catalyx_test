@@ -1,5 +1,4 @@
 defmodule CatalyxTest.AWS.S3Client do
-
   defp is_prod, do: Mix.env() == :prod
   defp s3_bucket, do: Application.get_env(:ex_aws, :s3)[:bucket]
   defp config, do: ExAws.Config.new(:s3, [])
@@ -39,8 +38,8 @@ defmodule CatalyxTest.AWS.S3Client do
   end
 
   def download_object(object_key, file_path),
-      do:
-        s3_bucket()
-        |> ExAws.S3.download_file(object_key, file_path)
-        |> ExAws.request()
+    do:
+      s3_bucket()
+      |> ExAws.S3.download_file(object_key, file_path)
+      |> ExAws.request()
 end

@@ -17,7 +17,15 @@ defmodule CatalyxTest.Finances.Trade do
     timestamps()
   end
 
-  @required_fields [:market_symbol, :amount, :price, :transaction_type, :executed_at_date, :executed_at_time, :external_id]
+  @required_fields [
+    :market_symbol,
+    :amount,
+    :price,
+    :transaction_type,
+    :executed_at_date,
+    :executed_at_time,
+    :external_id
+  ]
   @fields @required_fields ++ [:processed]
 
   @doc false

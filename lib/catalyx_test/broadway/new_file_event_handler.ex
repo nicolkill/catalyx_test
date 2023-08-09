@@ -5,8 +5,8 @@ defmodule CatalyxTest.Broadway.NewFileEventHandler do
   alias CatalyxTest.CsvProcessor
 
   defp queue_url,
-       do:
-         "#{Application.get_env(:ex_aws, :sqs)[:base_queue_url]}#{Application.get_env(:ex_aws, :sqs)[:new_files_queue]}"
+    do:
+      "#{Application.get_env(:ex_aws, :sqs)[:base_queue_url]}#{Application.get_env(:ex_aws, :sqs)[:new_files_queue]}"
 
   defp producer_module, do: Application.get_env(:catalyx_test, :broadway)[:producer_module]
 
@@ -47,9 +47,11 @@ defmodule CatalyxTest.Broadway.NewFileEventHandler do
           }
           when event_name in ["ObjectCreated:Put", "ObjectCreated:Post"] ->
             CsvProcessor.schedule_file(object_key)
+
           _ ->
             :ok
         end)
+
       _ ->
         :ok
     end

@@ -54,6 +54,7 @@ defmodule CatalyxTest.FinancesTest do
 
     test "update_trade/2 with valid data updates the trade" do
       trade = trade_fixture()
+
       update_attrs = %{
         market_symbol: "some updated market_symbol",
         amount: 456.7,
@@ -97,7 +98,16 @@ defmodule CatalyxTest.FinancesTest do
 
     import CatalyxTest.FinancesFixtures
 
-    @invalid_attrs %{period: nil, opening_at: nil, opening_price: nil, closing_price: nil, highest_price: nil, lowest_price: nil, trend: nil, market_symbol: nil}
+    @invalid_attrs %{
+      period: nil,
+      opening_at: nil,
+      opening_price: nil,
+      closing_price: nil,
+      highest_price: nil,
+      lowest_price: nil,
+      trend: nil,
+      market_symbol: nil
+    }
 
     test "list_candle_indicators/0 returns all candle_indicators" do
       candle_indicator = candle_indicator_fixture()
@@ -110,9 +120,21 @@ defmodule CatalyxTest.FinancesTest do
     end
 
     test "create_candle_indicator/1 with valid data creates a candle_indicator" do
-      valid_attrs = %{period: ~D[2023-08-07], opening_at: ~T[07:38:00Z], opening_price: 120.5, closing_at: ~T[19:38:00Z], closing_price: 120.5, highest_price: 120.5, lowest_price: 120.5, trend: 1, market_symbol: "some market_symbol"}
+      valid_attrs = %{
+        period: ~D[2023-08-07],
+        opening_at: ~T[07:38:00Z],
+        opening_price: 120.5,
+        closing_at: ~T[19:38:00Z],
+        closing_price: 120.5,
+        highest_price: 120.5,
+        lowest_price: 120.5,
+        trend: 1,
+        market_symbol: "some market_symbol"
+      }
 
-      assert {:ok, %CandleIndicator{} = candle_indicator} = Finances.create_candle_indicator(valid_attrs)
+      assert {:ok, %CandleIndicator{} = candle_indicator} =
+               Finances.create_candle_indicator(valid_attrs)
+
       assert candle_indicator.period == ~D[2023-08-07]
       assert candle_indicator.opening_at == ~T[07:38:00Z]
       assert candle_indicator.opening_price == 120.5
@@ -130,9 +152,22 @@ defmodule CatalyxTest.FinancesTest do
 
     test "update_candle_indicator/2 with valid data updates the candle_indicator" do
       candle_indicator = candle_indicator_fixture()
-      update_attrs = %{period: ~D[2023-08-08], opening_at: ~T[08:38:00Z], opening_price: 456.7, closing_at: ~T[18:38:00Z], closing_price: 456.7, highest_price: 456.7, lowest_price: 456.7, trend: -1, market_symbol: "some updated market_symbol"}
 
-      assert {:ok, %CandleIndicator{} = candle_indicator} = Finances.update_candle_indicator(candle_indicator, update_attrs)
+      update_attrs = %{
+        period: ~D[2023-08-08],
+        opening_at: ~T[08:38:00Z],
+        opening_price: 456.7,
+        closing_at: ~T[18:38:00Z],
+        closing_price: 456.7,
+        highest_price: 456.7,
+        lowest_price: 456.7,
+        trend: -1,
+        market_symbol: "some updated market_symbol"
+      }
+
+      assert {:ok, %CandleIndicator{} = candle_indicator} =
+               Finances.update_candle_indicator(candle_indicator, update_attrs)
+
       assert candle_indicator.period == ~D[2023-08-08]
       assert candle_indicator.opening_at == ~T[08:38:00Z]
       assert candle_indicator.opening_price == 456.7
@@ -146,14 +181,20 @@ defmodule CatalyxTest.FinancesTest do
 
     test "update_candle_indicator/2 with invalid data returns error changeset" do
       candle_indicator = candle_indicator_fixture()
-      assert {:error, %Ecto.Changeset{}} = Finances.update_candle_indicator(candle_indicator, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Finances.update_candle_indicator(candle_indicator, @invalid_attrs)
+
       assert candle_indicator == Finances.get_candle_indicator!(candle_indicator.id)
     end
 
     test "delete_candle_indicator/1 deletes the candle_indicator" do
       candle_indicator = candle_indicator_fixture()
       assert {:ok, %CandleIndicator{}} = Finances.delete_candle_indicator(candle_indicator)
-      assert_raise Ecto.NoResultsError, fn -> Finances.get_candle_indicator!(candle_indicator.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Finances.get_candle_indicator!(candle_indicator.id)
+      end
     end
 
     test "change_candle_indicator/1 returns a candle_indicator changeset" do

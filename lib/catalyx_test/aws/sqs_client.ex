@@ -1,5 +1,4 @@
 defmodule CatalyxTest.AWS.SqsClient do
-
   defp base_queue_url, do: Application.get_env(:ex_aws, :sqs)[:base_queue_url]
 
   def add_message_to_queue(queue, data) do

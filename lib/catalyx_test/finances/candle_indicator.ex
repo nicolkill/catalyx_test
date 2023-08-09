@@ -20,7 +20,17 @@ defmodule CatalyxTest.Finances.CandleIndicator do
     timestamps()
   end
 
-  @required_fields [:opening_at, :opening_price, :closing_at, :closing_price, :highest_price, :lowest_price, :trend, :period, :market_symbol]
+  @required_fields [
+    :opening_at,
+    :opening_price,
+    :closing_at,
+    :closing_price,
+    :highest_price,
+    :lowest_price,
+    :trend,
+    :period,
+    :market_symbol
+  ]
   @fields @required_fields ++ [:sma_values, :sma_count]
 
   @doc false

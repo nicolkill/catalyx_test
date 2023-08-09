@@ -12,7 +12,7 @@ defmodule CatalyxTestWeb.ProcessTest do
     assert %{resp_body: body} = post(conn, "/api/v1/get_presigned_url")
     assert %{"url" => url} = Jason.decode!(body)
 
-    with_mock HTTPoison, [put!: fn(_url, _params) -> %{status_code: 204} end] do
+    with_mock HTTPoison, put!: fn _url, _params -> %{status_code: 204} end do
       %{status_code: _code} = HTTPoison.put!(url, {:file, "/example/path"})
 
       message = %{
@@ -68,17 +68,14 @@ defmodule CatalyxTestWeb.ProcessTest do
     end
   end
 
-  test "process_file", %{conn: _conn}  do
+  test "process_file", %{conn: _conn} do
     with_mocks([
-      {CatalyxTest.AWS.S3Client,
-        [],
-        [does_object_exist: fn(_) -> :ok end]},
-      {CatalyxTest.AWS.S3Client,
-        [],
-        [download_object: fn(_, _) -> {:ok, :done} end]}
+      {CatalyxTest.AWS.S3Client, [], [does_object_exist: fn _ -> :ok end]},
+      {CatalyxTest.AWS.S3Client, [], [download_object: fn _, _ -> {:ok, :done} end]}
     ]) do
       assert :ok = CsvProcessor.process_file("example.csv")
       assert {:ok, :ok} = TradeProcessor.process_period(~D[2023-07-30])
+
       assert [
                %CatalyxTest.Finances.CandleIndicator{
                  period: ~D[2023-07-30],
@@ -94,22 +91,22 @@ defmodule CatalyxTestWeb.ProcessTest do
                %CatalyxTest.Finances.CandleIndicator{
                  period: ~D[2023-07-30],
                  opening_at: ~T[00:19:30],
-                 opening_price: 95753985.9902562,
+                 opening_price: 95_753_985.9902562,
                  closing_at: ~T[00:19:30],
-                 closing_price: 95753985.9902562,
-                 highest_price: 95753985.9902562,
-                 lowest_price: 100000.0,
+                 closing_price: 95_753_985.9902562,
+                 highest_price: 95_753_985.9902562,
+                 lowest_price: 100_000.0,
                  trend: 1,
                  market_symbol: "BTC-CAD"
                },
                %CatalyxTest.Finances.CandleIndicator{
                  period: ~D[2023-07-30],
                  opening_at: ~T[04:30:12],
-                 opening_price: 71475930.8892505,
+                 opening_price: 71_475_930.8892505,
                  closing_at: ~T[04:30:12],
-                 closing_price: 71475930.8892505,
-                 highest_price: 71475930.8892505,
-                 lowest_price: 100000.0,
+                 closing_price: 71_475_930.8892505,
+                 highest_price: 71_475_930.8892505,
+                 lowest_price: 100_000.0,
                  trend: -1,
                  market_symbol: "BTC-USD"
                },
@@ -138,5 +135,4 @@ defmodule CatalyxTestWeb.ProcessTest do
              ] = Finances.list_candle_indicators()
     end
   end
-
 end

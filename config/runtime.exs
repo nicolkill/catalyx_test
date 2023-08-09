@@ -2,11 +2,11 @@ import Config
 
 defmodule RuntimeUtil do
   def get_env_or_raise_error(var_name),
-      do:
-        System.get_env(var_name) ||
-          raise("""
-          environment variable #{var_name} is missing.
-          """)
+    do:
+      System.get_env(var_name) ||
+        raise("""
+        environment variable #{var_name} is missing.
+        """)
 end
 
 # config/runtime.exs is executed for all environments, including

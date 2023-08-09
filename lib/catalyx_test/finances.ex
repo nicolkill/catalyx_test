@@ -196,6 +196,7 @@ defmodule CatalyxTest.Finances do
       |> where(period: ^period)
       |> where(market_symbol: ^symbol)
       |> Repo.one()
+
     case indicator do
       nil ->
         %CandleIndicator{
@@ -205,12 +206,13 @@ defmodule CatalyxTest.Finances do
           closing_at: ~T[00:00:00Z],
           closing_price: 0.0,
           highest_price: 0.0,
-          lowest_price: 100000.0,
+          lowest_price: 100_000.0,
           trend: 0,
           sma_values: [],
           sma_count: 0,
           market_symbol: symbol
         }
+
       period_record ->
         period_record
     end

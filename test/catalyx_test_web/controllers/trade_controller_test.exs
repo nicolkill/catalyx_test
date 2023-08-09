@@ -53,7 +53,6 @@ defmodule CatalyxTestWeb.TradeControllerTest do
   end
 
   describe "trade actions" do
-
     test "insert single trade in multiple input", %{conn: conn} do
       conn = post(conn, ~p"/api/v1/trades", data: [@create_attrs])
       assert [%{"id" => _id} | _] = json_response(conn, 201)["data"]
