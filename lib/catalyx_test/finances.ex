@@ -6,6 +6,7 @@ defmodule CatalyxTest.Finances do
   import Ecto.Query, warn: false
   alias CatalyxTest.Repo
 
+  alias CatalyxTest.Finances.CandleIndicator
   alias CatalyxTest.Finances.Trade
 
   @doc """
@@ -17,8 +18,21 @@ defmodule CatalyxTest.Finances do
       [%Trade{}, ...]
 
   """
-  def list_trades do
+  def list_trades() do
     Repo.all(Trade)
+  end
+
+  def trades_count_with_period() do
+    Trade
+    |> select([t], {t.executed_at_date, count(t.id)})
+    |> group_by([t], t.executed_at_date)
+    |> Repo.all()
+  end
+
+  def get_trades_by_period_stream(period) do
+    Trade
+    |> where(executed_at_date: ^period)
+    |> Repo.stream()
   end
 
   @doc """
@@ -104,5 +118,123 @@ defmodule CatalyxTest.Finances do
 
   def new_change_trade(attrs \\ %{}) do
     Trade.changeset(%Trade{}, attrs)
+  end
+
+  @doc """
+  Returns the list of candle_indicators.
+
+  ## Examples
+
+      iex> list_candle_indicators()
+      [%CandleIndicator{}, ...]
+
+  """
+  def list_candle_indicators do
+    Repo.all(CandleIndicator)
+  end
+
+  def get_candle_indicator_by_period!(period, symbol) do
+    indicator =
+      CandleIndicator
+      |> where(period: ^period)
+      |> where(market_symbol: ^symbol)
+      |> Repo.one()
+    case indicator do
+      nil ->
+        %CandleIndicator{
+          period: period,
+          opening_at: ~T[23:59:59Z],
+          opening_price: 0.0,
+          closing_at: ~T[00:00:00Z],
+          closing_price: 0.0,
+          highest_price: 0.0,
+          lowest_price: 0.0,
+          trend: 0,
+          market_symbol: symbol
+        }
+      period_record ->
+        period_record
+    end
+  end
+
+  @doc """
+  Gets a single candle_indicator.
+
+  Raises `Ecto.NoResultsError` if the Candle indicator does not exist.
+
+  ## Examples
+
+      iex> get_candle_indicator!(123)
+      %CandleIndicator{}
+
+      iex> get_candle_indicator!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_candle_indicator!(id), do: Repo.get!(CandleIndicator, id)
+
+  @doc """
+  Creates a candle_indicator.
+
+  ## Examples
+
+      iex> create_candle_indicator(%{field: value})
+      {:ok, %CandleIndicator{}}
+
+      iex> create_candle_indicator(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_candle_indicator(attrs \\ %{}) do
+    %CandleIndicator{}
+    |> CandleIndicator.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a candle_indicator.
+
+  ## Examples
+
+      iex> update_candle_indicator(candle_indicator, %{field: new_value})
+      {:ok, %CandleIndicator{}}
+
+      iex> update_candle_indicator(candle_indicator, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_candle_indicator(%CandleIndicator{} = candle_indicator, attrs) do
+    candle_indicator
+    |> CandleIndicator.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a candle_indicator.
+
+  ## Examples
+
+      iex> delete_candle_indicator(candle_indicator)
+      {:ok, %CandleIndicator{}}
+
+      iex> delete_candle_indicator(candle_indicator)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_candle_indicator(%CandleIndicator{} = candle_indicator) do
+    Repo.delete(candle_indicator)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking candle_indicator changes.
+
+  ## Examples
+
+      iex> change_candle_indicator(candle_indicator)
+      %Ecto.Changeset{data: %CandleIndicator{}}
+
+  """
+  def change_candle_indicator(%CandleIndicator{} = candle_indicator, attrs \\ %{}) do
+    CandleIndicator.changeset(candle_indicator, attrs)
   end
 end

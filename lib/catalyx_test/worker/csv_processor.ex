@@ -50,7 +50,7 @@ defmodule CatalyxTest.CsvProcessor do
     {files, processing} =
       case files do
         [file_path | rest] ->
-          Task.async(CatalyxTest.CsvProcessor, :process_file, [file_path])
+          Task.async(__MODULE__, :process_file, [file_path])
           {rest, true}
         [] ->
           {files, false}
@@ -63,7 +63,7 @@ defmodule CatalyxTest.CsvProcessor do
   def handle_info(_, {files, processing}), do: {:noreply, {files, processing}}
 
   defp schedule_file_check() do
-    # check again in 2 seconds
+    # check again in 5 seconds
     Process.send_after(self(), :file_process, 5  * 1000)
   end
 
@@ -87,10 +87,10 @@ defmodule CatalyxTest.CsvProcessor do
       |> Stream.chunk_every(30)
       |> Stream.map(&process_chunk/1)
       |> Stream.run()
+
+      # delete the file after processing
     rescue
       e ->
-        IO.inspect(e, label: "file error")
-        IO.inspect(Exception.format(:error, e, __STACKTRACE__), label: "stacktrace")
         :ok
     end
 
@@ -98,7 +98,8 @@ defmodule CatalyxTest.CsvProcessor do
   end
 
   defp process_chunk(chunk) do
-    Enum.flat_map(chunk, fn
+    chunk
+    |> Enum.flat_map(fn
       "id,market" <> _ ->
         []
       part ->
@@ -110,18 +111,22 @@ defmodule CatalyxTest.CsvProcessor do
     end)
     |> Enum.reduce(Ecto.Multi.new(), fn row, transaction ->
       [external_id, market_symbol, size, price, taker_side, executed_at] = row
+
+      date_time = NaiveDateTime.from_iso8601!(executed_at)
+
       changeset = CatalyxTest.Finances.new_change_trade(%{
         market_symbol: market_symbol,
         amount: size,
         price: price,
         transaction_type: taker_side,
-        executed_at: executed_at,
+        executed_at_date: NaiveDateTime.to_date(date_time),
+        executed_at_time: NaiveDateTime.to_time(date_time),
         external_id: external_id
       })
 
       Ecto.Multi.insert(transaction, "#{market_symbol}_#{external_id}", changeset)
     end)
-    |> CatalyxTest.Repo.transaction
+    |> CatalyxTest.Repo.transaction()
   end
   
 end

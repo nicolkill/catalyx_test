@@ -4,6 +4,7 @@ defmodule CatalyxTestWeb.ProcessTest do
   import Mock
 
   alias CatalyxTest.CsvProcessor
+  alias CatalyxTest.TradeProcessor
   alias CatalyxTest.Broadway.NewFileEventHandler
 
   test "get presigned url, push file and verify genserver queued files", %{conn: conn} do
@@ -76,7 +77,7 @@ defmodule CatalyxTestWeb.ProcessTest do
         [download_object: fn(_, _) -> {:ok, :done} end]}
     ]) do
       assert :ok = CsvProcessor.process_file("example.csv")
-                   |> IO.inspect(label: "CsvProcessor.process_file")
+      assert {:ok, :ok} = TradeProcessor.process_period(~D[2023-07-30])
     end
   end
 

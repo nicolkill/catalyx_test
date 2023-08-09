@@ -19,7 +19,8 @@ defmodule CatalyxTest.Application do
       # Start a worker by calling: CatalyxTest.Worker.start_link(arg)
       # {CatalyxTest.Worker, arg}
       {CatalyxTest.Broadway.NewFileEventHandler, []},
-      CatalyxTest.CsvProcessor
+      CatalyxTest.CsvProcessor,
+      CatalyxTest.TradeProcessor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
