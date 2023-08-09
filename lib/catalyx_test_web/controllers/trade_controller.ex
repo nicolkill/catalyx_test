@@ -7,14 +7,13 @@ defmodule CatalyxTestWeb.TradeController do
   action_fallback CatalyxTestWeb.FallbackController
 
   def index(conn, %{"size" => size} = params) do
-    symbol = Map.get(params, "symbol")
+    market = Map.get(params, "market")
 
     trades =
-      if is_nil(symbol) do
+      if is_nil(market) do
         Finances.list_trades([], size)
       else
-        symbol = Map.get(params, "symbol")
-        Finances.list_trades([market_symbol: symbol], size)
+        Finances.list_trades([market_symbol: market], size)
       end
 
     render(conn, :index, trades: trades)
@@ -39,7 +38,7 @@ defmodule CatalyxTestWeb.TradeController do
           price: :number,
           transaction_type: :string,
           executed_at: :string,
-          external_id: :string
+          external_id?: :string
         }
       ]
     }

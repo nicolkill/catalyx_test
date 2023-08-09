@@ -32,7 +32,7 @@ defmodule CatalyxTestWeb.TradeControllerTest do
     end
 
     test "get last n trades with symbol", %{conn: conn, trade: trade} do
-      conn = get(conn, ~p"/api/v1/trades", %{size: "30", symbol: trade.market_symbol})
+      conn = get(conn, ~p"/api/v1/trades", %{size: "30", market: trade.market_symbol})
       assert [%{"id" => _id} | _] = json_response(conn, 200)["data"]
     end
 

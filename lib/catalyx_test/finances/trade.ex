@@ -23,10 +23,9 @@ defmodule CatalyxTest.Finances.Trade do
     :price,
     :transaction_type,
     :executed_at_date,
-    :executed_at_time,
-    :external_id
+    :executed_at_time
   ]
-  @fields @required_fields ++ [:processed]
+  @fields @required_fields ++ [:processed, :external_id]
 
   @doc false
   def changeset(trade, attrs) do
