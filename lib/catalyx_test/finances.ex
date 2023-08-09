@@ -9,6 +9,12 @@ defmodule CatalyxTest.Finances do
   alias CatalyxTest.Finances.CandleIndicator
   alias CatalyxTest.Finances.Trade
 
+  defp last_trades_query(query, size) do
+    query
+    |> order_by([t], desc: t.executed_at_date, desc: t.executed_at_time)
+    |> limit(^size)
+  end
+
   @doc """
   Returns the list of trades.
 
@@ -18,8 +24,19 @@ defmodule CatalyxTest.Finances do
       [%Trade{}, ...]
 
   """
-  def list_trades() do
-    Repo.all(Trade)
+  @spec list_trades(integer()) :: [%Trade{}]
+  def list_trades(size \\ 50) do
+    Trade
+    |> last_trades_query(size)
+    |> Repo.all()
+  end
+
+  @spec list_trades_by_market_symbol(String.t(), integer()) :: [%Trade{}]
+  def list_trades_by_market_symbol(market_symbol, size \\ 50) do
+    Trade
+    |> where(market_symbol: ^market_symbol)
+    |> last_trades_query(size)
+    |> Repo.all()
   end
 
   def trades_count_with_period() do
@@ -129,7 +146,7 @@ defmodule CatalyxTest.Finances do
       [%CandleIndicator{}, ...]
 
   """
-  def list_candle_indicators do
+  def list_candle_indicators(count \\ 20) do
     Repo.all(CandleIndicator)
   end
 
@@ -148,7 +165,7 @@ defmodule CatalyxTest.Finances do
           closing_at: ~T[00:00:00Z],
           closing_price: 0.0,
           highest_price: 0.0,
-          lowest_price: 0.0,
+          lowest_price: 100000.0,
           trend: 0,
           market_symbol: symbol
         }

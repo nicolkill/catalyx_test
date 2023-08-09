@@ -9,5 +9,7 @@ defmodule CatalyxTestWeb.Router do
     pipe_through :api
 
     post "/get_presigned_url", FileController, :get_presigned_url
+    get "/trades", TradeController, :index
+    post "/trades", TradeController, :insert_multi
   end
 end

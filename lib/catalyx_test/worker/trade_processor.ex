@@ -43,6 +43,7 @@ defmodule CatalyxTest.TradeProcessor do
 
     {:noreply, false}
   end
+  def handle_info(_, processing), do: {:noreply, processing}
 
   defp process_trades() do
     # check again in 5 seconds
@@ -95,25 +96,53 @@ defmodule CatalyxTest.TradeProcessor do
             amount: amount,
             price: price,
             transaction_type: type,
-            executed_at_date: ~D[2023-07-30]
+            executed_at_time: executed_at_time
           } = trade
 
           int_amount = ceil(amount)
           unit_price = ((int_amount * price) / amount) / int_amount
 
-          transaction = Ecto.Multi.delete(transaction, "#{market_symbol}_#{external_id}", trade)
           trend = trend + (if type == :sell, do: +1, else: -1)
-#          todo: calcs to add the right prices, [opening_at, opening, closing_at, closing, highest, lowest] are missing
+          {opening_at, opening} =
+            if Time.diff(opening_at, executed_at_time) > 0 do
+              {executed_at_time, unit_price}
+            else
+              {opening_at, opening}
+            end
+          {closing_at, closing} =
+            if Time.diff(executed_at_time, closing_at) > 0 do
+              {executed_at_time, unit_price}
+            else
+              {closing_at, closing}
+            end
 
-          {transaction, trend, opening_at, opening, closing_at, closing, highest, lowest}
+          highest = if unit_price > highest, do: unit_price, else: highest
+          lowest = if unit_price < lowest, do: unit_price, else: lowest
+
+          {
+            Ecto.Multi.delete(transaction, "#{market_symbol}_#{external_id}", trade),
+            trend,
+            opening_at,
+            opening,
+            closing_at,
+            closing,
+            highest,
+            lowest
+          }
       end)
 
     period_record = Finances.change_candle_indicator(period_record, %{
-      trend: trend
+      trend: trend,
+      opening_at: opening_at,
+      opening_price: opening,
+      closing_at: closing_at,
+      closing_price: closing,
+      highest_price: highest,
+      lowest_price: lowest,
     })
 
     transaction
-    |> Ecto.Multi.insert_or_update("updated_period_record_#{inspect(period)}_#{market_symbol}", period_record)
+    |> Ecto.Multi.insert_or_update("upsert_period_record_#{inspect(period)}_#{market_symbol}", period_record)
     |> CatalyxTest.Repo.transaction()
   end
 

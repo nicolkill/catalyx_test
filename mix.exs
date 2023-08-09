@@ -47,7 +47,8 @@ defmodule CatalyxTest.MixProject do
       {:broadway_sqs, "~> 0.7.1"},
       {:hackney, "~> 1.9"},
       {:mock, "~> 0.3.0", only: :test},
-      {:httpoison, "~> 2.0"}
+      {:httpoison, "~> 2.0"},
+      {:map_schema_validator, "~> 0.1.6"}
     ]
   end
 

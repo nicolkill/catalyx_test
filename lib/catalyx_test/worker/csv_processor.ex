@@ -87,8 +87,6 @@ defmodule CatalyxTest.CsvProcessor do
       |> Stream.chunk_every(30)
       |> Stream.map(&process_chunk/1)
       |> Stream.run()
-
-      # delete the file after processing
     rescue
       e ->
         :ok
