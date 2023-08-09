@@ -24,7 +24,7 @@ defmodule CatalyxTestWeb.CandleIndicatorJSON do
   end
 
   defp trend_enum(trend) when trend >= 0, do: :bullish
-  defp trend_enum(trend), do: :bearish
+  defp trend_enum(_trend), do: :bearish
 
   defp data(%CandleIndicator{} = candle_indicator) do
     %{

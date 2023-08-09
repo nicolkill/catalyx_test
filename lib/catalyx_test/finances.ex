@@ -162,6 +162,7 @@ defmodule CatalyxTest.Finances do
   def list_candle_indicators(where \\ [], size \\ 50) do
     CandleIndicator
     |> where(^where)
+    |> limit(^size)
     |> Repo.all()
   end
 

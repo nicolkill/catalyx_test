@@ -19,6 +19,7 @@ defmodule CatalyxTest.CsvProcessor do
     GenServer.start_link(__MODULE__, default, name: CsvProcessor)
   end
 
+  @impl true
   def handle_call(:lookup, _, state), do: {:reply, state, state}
 
   def lookup() do
@@ -88,7 +89,7 @@ defmodule CatalyxTest.CsvProcessor do
       |> Stream.map(&process_chunk/1)
       |> Stream.run()
     rescue
-      e ->
+      _ ->
         :ok
     end
 

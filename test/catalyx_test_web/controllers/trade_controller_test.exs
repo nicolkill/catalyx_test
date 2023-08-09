@@ -3,8 +3,6 @@ defmodule CatalyxTestWeb.TradeControllerTest do
 
   import CatalyxTest.FinancesFixtures
 
-  alias CatalyxTest.Finances.Trade
-
   @create_attrs %{
     market_symbol: "some market_symbol",
     amount: 1.25,
@@ -30,25 +28,25 @@ defmodule CatalyxTestWeb.TradeControllerTest do
 
     test "get last n trades", %{conn: conn} do
       conn = get(conn, ~p"/api/v1/trades", %{size: "30"})
-      assert [%{"id" => id} | _] = json_response(conn, 200)["data"]
+      assert [%{"id" => _id} | _] = json_response(conn, 200)["data"]
     end
 
     test "get last n trades with symbol", %{conn: conn, trade: trade} do
       conn = get(conn, ~p"/api/v1/trades", %{size: "30", symbol: trade.market_symbol})
-      assert [%{"id" => id} | _] = json_response(conn, 200)["data"]
+      assert [%{"id" => _id} | _] = json_response(conn, 200)["data"]
     end
 
-    test "get last n trades with time frame", %{conn: conn, trade: trade} do
+    test "get last n trades with time frame", %{conn: conn} do
       conn = get(conn, ~p"/api/v1/trades", %{start: "2023-08-05", end: "2023-08-10"})
-      assert [%{"id" => id} | _] = json_response(conn, 200)["data"]
+      assert [%{"id" => _id} | _] = json_response(conn, 200)["data"]
     end
 
-    test "get last n trades with time frame out of date", %{conn: conn, trade: trade} do
+    test "get last n trades with time frame out of date", %{conn: conn} do
       conn = get(conn, ~p"/api/v1/trades", %{start: "2023-08-08", end: "2023-08-10"})
       assert [] = json_response(conn, 200)["data"]
     end
 
-    test "get last n trades with time frame invalid date", %{conn: conn, trade: trade} do
+    test "get last n trades with time frame invalid date", %{conn: conn} do
       conn = get(conn, ~p"/api/v1/trades", %{start: "2023-08-08", end: "not_valid"})
       assert ["end_date has invalid format"] == json_response(conn, 422)["errors"]
     end
@@ -58,7 +56,7 @@ defmodule CatalyxTestWeb.TradeControllerTest do
 
     test "insert single trade in multiple input", %{conn: conn} do
       conn = post(conn, ~p"/api/v1/trades", data: [@create_attrs])
-      assert [%{"id" => id} | _] = json_response(conn, 201)["data"]
+      assert [%{"id" => _id} | _] = json_response(conn, 201)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do

@@ -9,7 +9,6 @@ defmodule CatalyxTest.TradeProcessor do
 
   alias CatalyxTest.Finances
   alias CatalyxTest.Finances.Trade
-  alias CatalyxTest.Finances.CandleIndicator
 
   @impl true
   def init(_) do

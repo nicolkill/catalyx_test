@@ -13,7 +13,7 @@ defmodule CatalyxTestWeb.ProcessTest do
     assert %{"url" => url} = Jason.decode!(body)
 
     with_mock HTTPoison, [put!: fn(_url, _params) -> %{status_code: 204} end] do
-      %{status_code: code} = HTTPoison.put!(url, {:file, "/example/path"})
+      %{status_code: _code} = HTTPoison.put!(url, {:file, "/example/path"})
 
       message = %{
         "Records" => [

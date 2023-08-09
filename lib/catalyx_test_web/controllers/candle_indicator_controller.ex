@@ -2,7 +2,6 @@ defmodule CatalyxTestWeb.CandleIndicatorController do
   use CatalyxTestWeb, :controller
 
   alias CatalyxTest.Finances
-  alias CatalyxTest.Finances.CandleIndicator
 
   action_fallback CatalyxTestWeb.FallbackController
 
@@ -48,7 +47,7 @@ defmodule CatalyxTestWeb.CandleIndicatorController do
     render(conn, :sma_index, candle_indicators: candle_indicators)
   end
 
-  def sma_show(conn, %{"market" => market, "date" => date} = params) do
+  def sma_show(conn, %{"market" => market, "date" => date}) do
     with {_, {:ok, date}} <- {"date", Date.from_iso8601(date)} do
       candle_indicator = Finances.get_candle_indicator_query([market_symbol: market, period: date])
       render(conn, :sma_show, candle_indicator: candle_indicator)
