@@ -1,4 +1,4 @@
-defmodule CatalyxTest.Repo.Migrations.CreateCandleIndicators do
+defmodule CatalyxTest.Repo.Migrations.AddSmaFields do
   use Ecto.Migration
 
   def change do

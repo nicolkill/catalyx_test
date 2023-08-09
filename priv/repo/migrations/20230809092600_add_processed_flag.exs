@@ -1,4 +1,4 @@
-defmodule CatalyxTest.Repo.Migrations.CreateCandleIndicators do
+defmodule CatalyxTest.Repo.Migrations.AddProcessedFlag do
   use Ecto.Migration
 
   def change do

@@ -47,6 +47,7 @@ defmodule CatalyxTest.Finances do
     Trade
     |> select([t], {t.executed_at_date, count(t.id)})
     |> group_by([t], t.executed_at_date)
+    |> where(processed: false)
     |> Repo.all()
   end
 

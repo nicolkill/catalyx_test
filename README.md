@@ -13,6 +13,7 @@ All the calls to all endpoints are just a read from database, all calculations a
 ![diagram!](diagram.png "diagram")
 
 > The periods are of **24 hours** so will create the candles using the whole day transactions
+> Frontend it's the client, right now it's postman
 
 ## How to run it
 

@@ -22,16 +22,12 @@ defmodule CatalyxTest.TradeProcessor do
   end
 
   @impl true
-  def handle_cast(:start, _) do
-    {:noreply, true}
-  end
-
-  def handle_cast(:finish, _) do
+  def handle_cast(:finished, _) do
     {:noreply, false}
   end
 
-  def start_processing() do
-    GenServer.cast(TradeProcessor, :start)
+  defp start_processing() do
+    GenServer.cast(TradeProcessor, :finished)
   end
 
   @impl true
@@ -42,14 +38,14 @@ defmodule CatalyxTest.TradeProcessor do
 
     process_trades()
 
-    {:noreply, false}
+    {:noreply, true}
   end
 
   def handle_info(_, processing), do: {:noreply, processing}
 
   defp process_trades() do
     # check again in 5 seconds
-    Process.send_after(self(), :trade_process, 5 * 1000)
+    Process.send_after(self(), :trade_process, 10 * 1000)
   end
 
   def start_trades_processing() do
