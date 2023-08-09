@@ -15,6 +15,14 @@ defmodule CatalyxTestWeb.CandleIndicatorJSON do
     %{data: data(candle_indicator)}
   end
 
+  def sma_index(%{candle_indicators: candle_indicators}) do
+    %{data: for(candle_indicator <- candle_indicators, do: sma(candle_indicator))}
+  end
+
+  def sma_show(%{candle_indicator: candle_indicator}) do
+    %{data: sma(candle_indicator)}
+  end
+
   defp trend_enum(trend) when trend >= 0, do: :bullish
   defp trend_enum(trend), do: :bearish
 
@@ -28,6 +36,13 @@ defmodule CatalyxTestWeb.CandleIndicatorJSON do
       trend: trend_enum(candle_indicator.trend),
       period: candle_indicator.period,
       market_symbol: candle_indicator.market_symbol
+    }
+  end
+
+  defp sma(%CandleIndicator{} = candle_indicator) do
+    %{
+      period: candle_indicator.period,
+      sma: Enum.sum(candle_indicator.sma_values) / candle_indicator.sma_count
     }
   end
 end

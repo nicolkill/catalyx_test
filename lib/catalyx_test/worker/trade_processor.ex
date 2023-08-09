@@ -86,11 +86,13 @@ defmodule CatalyxTest.TradeProcessor do
       closing_price: closing,
       highest_price: highest,
       lowest_price: lowest,
+      sma_values: sma_values,
+      sma_count: sma_count
     } = period_record = Finances.get_candle_indicator_by_period!(period, market_symbol)
 
-    {transaction, trend, opening_at, opening, closing_at, closing, highest, lowest} =
-      Enum.reduce(data, {Ecto.Multi.new(), trend, opening_at, opening, closing_at, closing, highest, lowest}, fn
-        trade, {transaction, trend, opening_at, opening, closing_at, closing, highest, lowest} ->
+    {transaction, new_sma_values, new_sma_count, trend, opening_at, opening, closing_at, closing, highest, lowest} =
+      Enum.reduce(data, {Ecto.Multi.new(), [], 0, trend, opening_at, opening, closing_at, closing, highest, lowest}, fn
+        trade, {transaction, sma_values, sma_count, trend, opening_at, opening, closing_at, closing, highest, lowest} ->
           %Trade{
             external_id: external_id,
             amount: amount,
@@ -123,6 +125,8 @@ defmodule CatalyxTest.TradeProcessor do
 
           {
             Ecto.Multi.update(transaction, "#{market_symbol}_#{external_id}", trade),
+            [unit_price | sma_values],
+            sma_count + 1,
             trend,
             opening_at,
             opening,
@@ -141,6 +145,8 @@ defmodule CatalyxTest.TradeProcessor do
       closing_price: closing,
       highest_price: highest,
       lowest_price: lowest,
+      sma_values: sma_values ++ new_sma_values,
+      sma_count: sma_count + new_sma_count
     })
 
     transaction

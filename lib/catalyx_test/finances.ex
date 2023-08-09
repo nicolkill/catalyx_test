@@ -206,6 +206,8 @@ defmodule CatalyxTest.Finances do
           highest_price: 0.0,
           lowest_price: 100000.0,
           trend: 0,
+          sma_values: [],
+          sma_count: 0,
           market_symbol: symbol
         }
       period_record ->
@@ -228,6 +230,12 @@ defmodule CatalyxTest.Finances do
 
   """
   def get_candle_indicator!(id), do: Repo.get!(CandleIndicator, id)
+
+  def get_candle_indicator_query(where) do
+    CandleIndicator
+    |> where(^where)
+    |> Repo.one()
+  end
 
   @doc """
   Creates a candle_indicator.

@@ -8,6 +8,8 @@ The configuration adds the action to S3 to notify when some file it's pushed to 
 inserted to SQS with all the details and a worker verifies the message and enqueues to another worker that will insert all
 data to database and then another worker will check the pending records to evaluate and creates the candle stats
 
+> The periods are of **24 hours** so will create the candles using the whole day transactions
+
 ```
 pending image
 ```

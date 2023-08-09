@@ -6,6 +6,8 @@ defmodule CatalyxTestWeb.CandleIndicatorController do
 
   action_fallback CatalyxTestWeb.FallbackController
 
+  @six_months 30 * 6
+
   def index(conn, %{"size" => size, "start" => start_date, "end" => end_date} = params) do
     with {_, {:ok, start_date}} <- {"start_date", Date.from_iso8601(start_date)},
          {_, {:ok, end_date}} <- {"end_date", Date.from_iso8601(end_date)} do
@@ -28,49 +30,29 @@ defmodule CatalyxTestWeb.CandleIndicatorController do
     end
   end
 
+  def sma_index(conn, %{"market" => market} = params) do
+    start_date = Map.get(params, "start_date", "")
+    end_date = Map.get(params, "end_date", "")
 
+    {start_date, end_date} =
+      with {_, {:ok, start_date}} <- {"start_date", Date.from_iso8601(start_date)},
+           {_, {:ok, end_date}} <- {"end_date", Date.from_iso8601(end_date)} do
+        {start_date, end_date}
+      else
+        _ ->
+          today = Date.utc_today()
+          {Date.add(today, -@six_months), today}
+      end
 
-
-
-
-
-
-
-
-
-
-  def index(conn, _params) do
-    candle_indicators = Finances.list_candle_indicators()
-    render(conn, :index, candle_indicators: candle_indicators)
+    candle_indicators = Finances.list_candle_indicators_time_frame(start_date, end_date, [market_symbol: market])
+    render(conn, :sma_index, candle_indicators: candle_indicators)
   end
 
-  def create(conn, %{"candle_indicator" => candle_indicator_params}) do
-    with {:ok, %CandleIndicator{} = candle_indicator} <- Finances.create_candle_indicator(candle_indicator_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/candle_indicators/#{candle_indicator}")
-      |> render(:show, candle_indicator: candle_indicator)
+  def sma_show(conn, %{"market" => market, "date" => date} = params) do
+    with {_, {:ok, date}} <- {"date", Date.from_iso8601(date)} do
+      candle_indicator = Finances.get_candle_indicator_query([market_symbol: market, period: date])
+      render(conn, :sma_show, candle_indicator: candle_indicator)
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    candle_indicator = Finances.get_candle_indicator!(id)
-    render(conn, :show, candle_indicator: candle_indicator)
-  end
-
-  def update(conn, %{"id" => id, "candle_indicator" => candle_indicator_params}) do
-    candle_indicator = Finances.get_candle_indicator!(id)
-
-    with {:ok, %CandleIndicator{} = candle_indicator} <- Finances.update_candle_indicator(candle_indicator, candle_indicator_params) do
-      render(conn, :show, candle_indicator: candle_indicator)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    candle_indicator = Finances.get_candle_indicator!(id)
-
-    with {:ok, %CandleIndicator{}} <- Finances.delete_candle_indicator(candle_indicator) do
-      send_resp(conn, :no_content, "")
-    end
-  end
 end

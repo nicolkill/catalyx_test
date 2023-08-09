@@ -39,7 +39,9 @@ defmodule CatalyxTest.FinancesFixtures do
         highest_price: 120.5,
         lowest_price: 120.5,
         trend: 1,
-        market_symbol: "some market_symbol"
+        market_symbol: "some market_symbol",
+        sma_values: [20, 30, 25],
+        sma_count: 3
       })
       |> CatalyxTest.Finances.create_candle_indicator()
 

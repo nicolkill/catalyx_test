@@ -14,5 +14,7 @@ defmodule CatalyxTestWeb.Router do
     post "/trades", TradeController, :insert_multi
 
     get "/candle_indicators", CandleIndicatorController, :index
+    get "/candle_indicators/:market/sma", CandleIndicatorController, :sma_index
+    get "/candle_indicators/:market/sma_show", CandleIndicatorController, :sma_show
   end
 end
