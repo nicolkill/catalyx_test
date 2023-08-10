@@ -62,6 +62,8 @@ defmodule CatalyxTestWeb.TradeController do
           trade
         end)
 
+      CatalyxTest.TradeProcessor.start_processing()
+
       conn
       |> put_status(:created)
       |> render(:index, trades: trades)

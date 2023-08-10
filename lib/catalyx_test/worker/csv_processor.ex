@@ -89,7 +89,7 @@ defmodule CatalyxTest.CsvProcessor do
         end
 
       File.stream!(file_path)
-      |> Stream.chunk_every(30)
+      |> Stream.chunk_every(50)
       |> Stream.map(&process_chunk/1)
       |> Stream.run()
     rescue
@@ -97,6 +97,7 @@ defmodule CatalyxTest.CsvProcessor do
         :ok
     end
 
+    CatalyxTest.TradeProcessor.start_processing()
     continue_checking()
   end
 

@@ -14,7 +14,7 @@ defmodule CatalyxTest.TradeProcessor do
   def init(_) do
     process_trades()
 
-    {:ok, false}
+    {:ok, true}
   end
 
   def start_link(default) do
@@ -22,26 +22,31 @@ defmodule CatalyxTest.TradeProcessor do
   end
 
   @impl true
-  def handle_cast(:finished, _) do
+  def handle_cast(:start, _) do
     {:noreply, false}
   end
 
-  defp start_processing() do
-    GenServer.cast(TradeProcessor, :finished)
+  def start_processing() do
+    GenServer.cast(TradeProcessor, :start)
   end
 
   @impl true
-  def handle_info(:trade_process, true), do: {:noreply, true}
+  def handle_info(:trade_process, blocked) do
+    IO.inspect(blocked, label: "##################")
 
-  def handle_info(:trade_process, false) do
-    Task.async(__MODULE__, :start_trades_processing, [])
+    blocked = if !blocked do
+      Task.async(__MODULE__, :start_trades_processing, [])
+      !blocked
+    else
+      blocked
+    end
 
     process_trades()
 
-    {:noreply, true}
+    {:noreply, blocked}
   end
 
-  def handle_info(_, processing), do: {:noreply, processing}
+  def handle_info(_, blocked), do: {:noreply, blocked}
 
   defp process_trades() do
     # check again in 5 seconds
